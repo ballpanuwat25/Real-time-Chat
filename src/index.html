@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Chat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <form id="usernameForm">
+        <label for="username">Enter your username:</label>
+        <input id="username" required autocomplete="off" />
+        <button type="submit">Join Chat</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.getElementById('usernameForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var username = document.getElementById('username').value;
+            if (username) {
+                window.location.href = '/chat.html?username=' + encodeURIComponent(username);
+            }
+        });
+    </script>
+</body>
+
+
+</html>

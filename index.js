@@ -6,28 +6,27 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
+app.use(express.static(__dirname + '/src'));
+
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/src/index.html');
+});
+
+app.get('/chat.html', (req, res) => {
+  const username = req.query.username;
+  res.sendFile(__dirname + '/src/chat.html');
+  io.emit('user connected', username); // Inform all connected clients about the new user
 });
 
 io.on('connection', (socket) => {
   console.log('a user connected');
-
-  socket.on('set username', (username) => {
-    socket.username = username;
-  });
-
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
 
   socket.on('chat message', (msg) => {
-    console.log('message: ' + msg);
-
-    io.emit('chat message', {
-      username: socket.username,
-      message: msg
-    });
+    console.log('message: ' + msg.message);
+    io.emit('chat message', msg);
   });
 });
 

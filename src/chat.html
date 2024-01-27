@@ -1,8 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Socket.IO chat</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
     <style>
         body {
             margin: 0;
@@ -61,13 +65,8 @@
     </style>
 </head>
 
-<body>
-    <div id="username-form">
-        <label for="username">Username:</label>
-        <input type="text" id="username" />
-        <button id="set-username">Set Username</button>
-    </div>
 
+<body>
     <ul id="messages"></ul>
     <form id="form" action="">
         <input id="input" autocomplete="off" /><button>Send</button>
@@ -76,36 +75,38 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
-        var usernameForm = document.getElementById('username-form');
-        var setUsernameButton = document.getElementById('set-username');
-        var messagesForm = document.getElementById('form');
-
         var messages = document.getElementById('messages');
         var form = document.getElementById('form');
         var input = document.getElementById('input');
 
-        setUsernameButton.addEventListener('click', function () {
-            var usernameInput = document.getElementById('username');
-            if (usernameInput.value) {
-                socket.emit('set username', usernameInput.value);
-                usernameForm.style.display = 'none';
-                messagesForm.style.display = 'flex';
-            }
-        });
+        // Fetch and display the username from the URL
+        var urlParams = new URLSearchParams(window.location.search);
+        var username = urlParams.get('username');
+        var usernameItem = document.createElement('li');
+        usernameItem.textContent = 'You are: ' + username;
+        messages.appendChild(usernameItem);
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
             if (input.value) {
-                socket.emit('chat message', input.value);
+                // Emit chat message with the sender's name
+                socket.emit('chat message', { message: input.value, sender: username });
                 input.value = '';
             }
         });
 
         socket.on('chat message', function (data) {
             var item = document.createElement('li');
-            item.textContent = data.username + ': ' + data.message;
+            item.textContent = data.sender + ': ' + data.message;
             messages.appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
+            console.log('message from ' + data.sender + ': ' + data.message); // Log the message correctly
+        });
+
+        // Handle the user connected event
+        socket.on('user connected', function () {
+            var item = document.createElement('li');
+            messages.appendChild(item);
         });
     </script>
 </body>
